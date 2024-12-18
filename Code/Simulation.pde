@@ -39,7 +39,7 @@ void setup () {
 // This function creates and defines the position of new obstacles
 void setupWalls() {
   obstacles = new ArrayList<Obstacle>();                // We already did this operation in "setup" before calling "setupWalls" but it's always better to make sure we start with an empty vector, so we initialize the variable again.
-  for (int x = 0; x < width; x+= 15) {                  // For all points along the x-axis from coordinate x=0 to x=width with increments of 15: 0,15,30,45,...
+  for (int x = 0; x < width; x+= 5) {                  // For all points along the x-axis from coordinate x=0 to x=width with increments of 15: 0,15,30,45,...
     obstacles.add(new Obstacle(x, 10, 15));             // Creates a horizontal line of obstacles at the top of the sketch (y = 10); The parameter 15 defines the size of the obstacle in pixels
     obstacles.add(new Obstacle(x, height - 10, 15));    // Creates a horizontal line of obstacles at the bottom of the sketch (y = height - 10); The parameter 15 defines the size of the obstacle in pixels
   }
@@ -48,7 +48,7 @@ void setupWalls() {
 // This function creates and defines an alternative configuration to "setupWalls" for new obstacles
 void setupSin() {
   obstacles = new ArrayList<Obstacle>();                                    // We already did this operation in "setup" before calling "setupWalls" but it's always better to make sure we start with an empty vector, so we initialize the variable again.
-  for (int x = 0; x < width; x+= 15) {                                      // For all points along the x-axis from coordinate x=0 to x=width with increments of 15: 0,15,30,45,...
+  for (int x = 0; x < width; x+= 5) {                                      // For all points along the x-axis from coordinate x=0 to x=width with increments of 15: 0,15,30,45,...
     obstacles.add(new Obstacle(x, 150 + 80 * sin(x/100.), 15));             // Creates a sinusoidal wave of obstacles at the top of the sketch (amplitude: 80 pixels); The parameter 15 defines the size of the obstacle in pixels
     obstacles.add(new Obstacle(x, height - 150 + 80 * sin(x/100.), 15));    // Creates a sinusoidal wave of obstacles at the bottom of the sketch (amplitude: 80 pixels); The parameter 15 defines the size of the obstacle in pixels
   }
@@ -74,17 +74,23 @@ void draw () {
   }
 }
 
-void mousePressed () {                       // If any mouse button is pressed:
-  if (mouseButton == LEFT) {                 // If the pressed button is the Left one:
-    for (int i = 0; i < 20; i++) {           // Iterate variable i 20 times (we want to draw 20 little fish at random points near the mouse)
-                                             // Creates a new instance of LittleFish class and adds it to the littleFishes vector. The coordinates are the mouse coordinates +- a random value up to 100 pixels (in absolute value).
+void mousePressed () {                      // If any mouse button is pressed:
+  if (mouseButton == LEFT) {                // If the pressed button is the Left one:
+    for (int i = 0; i < 20; i++) {          // Iterate variable i 20 times (we want to draw 20 little fish at random points near the mouse)
+                                            // Creates a new instance of LittleFish class and adds it to the littleFishes vector. The coordinates are the mouse coordinates +- a random value up to 100 pixels (in absolute value).
       littleFishes.add(new LittleFish(mouseX + random(-100, 100), mouseY + random(-100, 100), countIDs++));
     }
-  } else if (mouseButton == CENTER) {        // If the pressed button is the Center one (scroll wheel):
-                                             // Creates a new instance of Obstacle class and adds it to the obstacles vector. The coordinates are the mouse coordinates. The obstacle size is 15 pixels.
+  } else if (mouseButton == CENTER) {       // If the pressed button is the Center one (scroll wheel):
+                                            // Creates a new instance of Obstacle class and adds it to the obstacles vector. The coordinates are the mouse coordinates. The obstacle size is 15 pixels.
     obstacles.add(new Obstacle(mouseX, mouseY, 15));
-  } else if (mouseButton == RIGHT) {         // If the pressed button is the Right one:
-                                             // Creates a new instance of Shark class and adds it to the sharks vector. The coordinates are the mouse coordinates +- a random value up to 50 pixels (in absolute value).
+  } else if (mouseButton == RIGHT) {        // If the pressed button is the Right one:
+                                            // Creates a new instance of Shark class and adds it to the sharks vector. The coordinates are the mouse coordinates +- a random value up to 50 pixels (in absolute value).
     sharks.add(new Shark(mouseX + random(-50, 50), mouseY + random(-50, 50), countIDs++));
+  }
+}
+void mouseDragged() {
+  if (mouseButton == CENTER) {              // If the dragged button is the Center one (scroll wheel):
+                                            // Creates a new instance of Obstacle class and adds it to the obstacles vector. The coordinates are the mouse coordinates. The obstacle size is 15 pixels.
+    obstacles.add(new Obstacle(mouseX, mouseY, 15));
   }
 }
