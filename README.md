@@ -7,6 +7,6 @@ Github upload date: 10/04/2018
 
 ## Screenshots
 
-<img src="/Images/1.PNG" width="450"/>
+<img src="/screenshots/1.PNG" width="600"/>
 
-<img src="/Images/2.PNG" width="450"/>
+<img src="/screenshots/2.PNG" width="600"/>
