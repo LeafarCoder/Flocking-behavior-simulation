@@ -1,71 +1,70 @@
-
 /*
-  Implementação da classe Shark
- Esta classe extende a classe abstrata Fish e por isso herda dela todos os seus atributos e métodos
- */
+  Implementation of the Shark class
+  This class extends the abstract Fish class and therefore inherits all its attributes and methods
+*/
 
 public class Shark extends Fish {
 
-  ArrayList<Shark> closeSharks;    // vetor que vai manter guardado os tubarões próximos
+  ArrayList<Shark> closeSharks;    // vector that keeps track of nearby sharks
 
-  private int crowdRadius = 300;   // raio para o qual os tubarões começam repulsar-se uns aos outros
-  private int maxSpeed = 1;        // velocidade máxima dos tubarões
+  private int crowdRadius = 300;   // radius at which sharks start to repel each other
+  private int maxSpeed = 1;        // maximum speed of sharks
 
-  // construtor dos tubarões (mesmo nome que o da classe!)
+  // constructor for sharks (same name as the class!)
   Shark(float xx, float yy, int id) {
-    super(xx, yy);                                // Usa o construtor da classe que extendemos (neste caso a classe Shark) para inicializar os atributos que vêem de lá
-    ID = id;                                      // E agroa inicializa os atributos que definimos na classe Shark
-    closeSharks = new ArrayList<Shark>();         // Inicializar a variável closeSharks a uma lista vazia. Antes disto a variável não era uma lista vazia! Era um Null, ou seja, comparando com matéria nem sequer era "vácuo" pois o vácuo já subentende volume. A ausência de tudo é Null. Um conceito estranho mas importante!
+    super(xx, yy);                                // Uses the constructor of the class we're extending (in this case the Fish class) to initialize attributes that come from there
+    ID = id;                                      // And now initializes the attributes we defined in the Shark class
+    closeSharks = new ArrayList<Shark>();         // Initialize the closeSharks variable to an empty list. Before this, the variable wasn't an empty list! It was Null, meaning that comparing with matter it wasn't even "vacuum" since vacuum already implies volume. The absence of everything is Null. A strange but important concept!
   }
 
-  // A função "move" foi declarada mas não definida na classe Fish, isto porque cada tipo de peixe se move de uma certa maneira.
+  // The "move" function was declared but not defined in the Fish class, because each type of fish moves in a certain way.
   PVector move() {
-    time++;                            // incrementa a idade do tubarão
-    getCopy();                         // faz uma cópia da lista de tubarões próximos do atual
+    time++;                            // increments the shark's age
+    getCopy();                         // makes a copy of the list of nearby sharks
 
-    PVector vel = this.getVel();       // a velocidade começa por ser a velocidade atual
+    PVector vel = this.getVel();       // velocity starts as the current velocity
 
-    // Há 3 fatores que influenciam o movimento de um tubarão:
-    PVector avoidObstacles = getAvoidObstacles();                                                      // vetor que define a direção de repulsão de obstáculos
-    PVector avoidSharks = getAvoidSharks();                                                            // vetor que define a direção de repulsão de tubarões
-    PVector noise = new PVector(2*noise(time/800., ID*800) - 1, 2*noise(time/800., ID*800+10) - 1);    // vetor que define uma direção aleatória usando Perlin Noise (um tipo de aleatoriedade mais orgânica)
+    // There are 3 factors that influence a shark's movement:
+    PVector avoidObstacles = getAvoidObstacles();                                                      // vector that defines the direction of obstacle repulsion
+    PVector avoidSharks = getAvoidSharks();                                                           // vector that defines the direction of shark repulsion
+    PVector noise = new PVector(2*noise(time/800., ID*800) - 1, 2*noise(time/800., ID*800+10) - 1);  // vector that defines a random direction using Perlin Noise (a more organic type of randomness)
 
-    // cada um dos três fatores pode ter um peso diferente
+    // each of the three factors can have a different weight
     avoidObstacles.mult(3);
     avoidSharks.mult(1);
-    noise.mult(0.1);    // quase não se considera o vetor aleatório (este serve só mesmo para alguma micro-variação)
+    noise.mult(0.1);    // almost doesn't consider the random vector (this is just for some micro-variation)
 
-    // adiciona os fatores (vetores) à velocidade
+    // adds the factors (vectors) to the velocity
     vel.add(avoidObstacles);
     vel.add(avoidSharks);
     vel.add(noise);
 
-    vel.limit(maxSpeed);    // limita a velocidade em módulo (para não somar indefinidamente e estoirar)
+    vel.limit(maxSpeed);    // limits the velocity magnitude (to prevent indefinite addition and overflow)
 
-    return vel;             // retorna a velocidade
+    return vel;             // returns the velocity
   }
 
-  // obtem os tubarões próximos e copia-os para "closeSharks"
+  // gets nearby sharks and copies them to "closeSharks"
   void getCopy() {
-    ArrayList<Shark> copy = new ArrayList<Shark>();                                                      // cria um array temporário
-    for (Shark other : sharks) {                                                                         // para cada tubarão "other":
-      if (other != this && PVector.dist(other.getPos(), this.getPos())< crowdRadius)copy.add(other);     // se não é o próprio tubarão (this) e se está a um raio próximo
+    ArrayList<Shark> copy = new ArrayList<Shark>();                                                      // creates a temporary array
+    for (Shark other : sharks) {                                                                        // for each shark "other":
+      if (other != this && PVector.dist(other.getPos(), this.getPos())< crowdRadius)copy.add(other);   // if it's not the shark itself (this) and if it's within proximity radius
     }
-    closeSharks = copy;  // copia o vetor temporário para o vetor global
+    closeSharks = copy;  // copies the temporary vector to the global vector
   }
 
-  // Define-se o método que indica o vetor respulsão que um tubarão sente de outros:
+  // Defines the method that indicates the repulsion vector that a shark feels from others:
   PVector getAvoidSharks() {
-    PVector steer = new PVector(0, 0);                                    // O resultado final começa a zero (vetor nulo)
-    for (Shark other : closeSharks) {                                     // Para cada tubarão existente "other":
-      float d = PVector.dist(this.getPos(), other.getPos());              // Calcular a distância "d" a que esse tubarão (other) está do tubarão atual (this) 
-      if (d < crowdRadius) {                                              // Se o tubarão "other" estiver dentro do raio "crowdRadius" então:
-        PVector diff = PVector.sub(this.getPos(), other.getPos());        // Calcula o vetor repulsão (é a diferença entre os vetores posição)
-        diff.normalize();                                                 // Normaliza o vetor diff
-        diff.div(d);                                                      // Pondera localmente o vetor. Se "other" está muito próximo cria maior repulsão logo o vetor será maior e vice-versa.
-        steer.add(diff);                                                  // Adiciona este vetor "diff" ao resultado final "steer"
+    PVector steer = new PVector(0, 0);                                    // The final result starts at zero (null vector)
+    for (Shark other : closeSharks) {                                     // For each existing shark "other":
+      float d = PVector.dist(this.getPos(), other.getPos());             // Calculate the distance "d" that this shark (other) is from the current shark (this)
+      if (d < crowdRadius) {                                             // If the shark "other" is within the "crowdRadius" then:
+        PVector diff = PVector.sub(this.getPos(), other.getPos());       // Calculate the repulsion vector (it's the difference between the position vectors)
+        diff.normalize();                                                // Normalize the diff vector
+        diff.div(d);                                                     // Locally weight the vector. If "other" is very close it creates greater repulsion so the vector will be larger and vice versa.
+        steer.add(diff);                                                 // Add this "diff" vector to the final result "steer"
       }
     }
-    return steer;                                                         // retorna o resultado final "steer" que é o resultado das repulsões feitas pelos tubarões "other" próximos do tubarão atual (this)
+    return steer;                                                        // return the final result "steer" which is the result of repulsions made by nearby "other" sharks from the current shark (this)
   }
 }

@@ -1,42 +1,42 @@
 /*
-  Implementação da classe LittleFish
- Esta classe extende a classe abstrata Fish e por isso herda dela todos os seus atributos e métodos
- */
+  Implementation of the LittleFish class
+  This class extends the abstract Fish class and therefore inherits all its attributes and methods
+*/
 
 public class LittleFish extends Fish {
 
-  ArrayList<LittleFish> closeLittleFishes;      // vetor que vai manter guardado os peixes miúdo próximos
+  ArrayList<LittleFish> closeLittleFishes;      // vector that keeps track of nearby little fish
 
-  // Atributos (variáveis de comportamento)
-  private int friendRadius = 70;   // raio necessário para se adquirar a velocidade de vizinhos (alinhamento)
-  private int crowdRadius = 50;    // raio necessário para haver repulsão de outros peixes miúdos
-  private int coheseRadius = 65;   // raio necessário para haver coesão entre um peixe miúdo e um cardume
-  private int sharkRadius = 200;   // raio necessário para haver repulsão de tubarões
-  private int maxSpeed = 2;        // velocidade máxima do peixe miúdo
+  // Attributes (behavior variables)
+  private int friendRadius = 70;   // radius needed to acquire the velocity of neighbors (alignment)
+  private int crowdRadius = 50;    // radius needed for repulsion from other little fish
+  private int coheseRadius = 65;   // radius needed for cohesion between a little fish and a school
+  private int sharkRadius = 200;   // radius needed for repulsion from sharks
+  private int maxSpeed = 2;        // maximum speed of the little fish
 
-  // construtor dos peixes miúdo (mesmo nome que o da classe!)
+  // constructor for little fish (same name as the class!)
   LittleFish(float xx, float yy, int id) {
-    super(xx, yy);                                      // Usa o construtor da classe que extendemos (neste caso a classe LittleFish) para inicializar os atributos que vêem de lá                                         
-    ID = id;                                            // E agroa inicializa os atributos que definimos na classe Shark
-    closeLittleFishes = new ArrayList<LittleFish>();    // Inicializar a variável closeLittleFishes a uma lista vazia. Antes disto a variável não era uma lista vazia! Era um Null, ou seja, comparando com matéria nem sequer era "vácuo" pois o vácuo já subentende volume. A ausência de tudo é Null. Um conceito estranho mas importante!
+    super(xx, yy);                                      // Uses the constructor of the class we're extending (in this case the Fish class) to initialize attributes that come from there
+    ID = id;                                            // And now initializes the attributes we defined in the LittleFish class
+    closeLittleFishes = new ArrayList<LittleFish>();    // Initialize the closeLittleFishes variable to an empty list. Before this, the variable wasn't an empty list! It was Null, meaning that comparing with matter it wasn't even "vacuum" since vacuum already implies volume. The absence of everything is Null. A strange but important concept!
   }
 
-  // A função "move" foi declarada mas não definida na classe Fish, isto porque cada tipo de peixe se move de uma certa maneira.
+  // The "move" function was declared but not defined in the Fish class, because each type of fish moves in a certain way.
   PVector move() {
-    time++;                                           // incrementa a idade do tubarão
-    getCopy();                                        // faz uma cópia da lista dos peixes miúdo próximos do atual
+    time++;                                           // increments the fish's age
+    getCopy();                                        // makes a copy of the list of nearby little fish
 
-    PVector vel = this.getVel();                      // a velocidade começa por ser a velocidade atual
+    PVector vel = this.getVel();                      // velocity starts as the current velocity
 
-    // Há 6 fatores que influenciam o movimento de um peixe miúdo:
-    PVector allign = getAverageDir();                                                                  // vetor que define a direção geral de movimento de um cardume
-    PVector avoidDir = getAvoidLittleFishDir();                                                        // vetor que define a direção de repulsão de peixes miúdo
-    PVector avoidSharkDir = getAvoidSharkDir();                                                        // vetor que define a direção de repulsão de tubarões
-    PVector cohese = getCohesion();                                                                    // vetor que define a coesão de um certo cardume de peixes miúdo
-    PVector avoidObstacles = getAvoidObstacles();                                                      // vetor que define a direção de repulsão de obstáculos
-    PVector noise = new PVector(2*noise(time/800., ID*800) - 1, 2*noise(time/800., ID*800+10) - 1);    // vetor que define uma direção aleatória usando Perlin Noise (um tipo de aleatoriedade mais orgânica)
+    // There are 6 factors that influence a little fish's movement:
+    PVector allign = getAverageDir();                                                                  // vector that defines the general direction of movement of a school
+    PVector avoidDir = getAvoidLittleFishDir();                                                       // vector that defines the direction of repulsion from little fish
+    PVector avoidSharkDir = getAvoidSharkDir();                                                       // vector that defines the direction of repulsion from sharks
+    PVector cohese = getCohesion();                                                                   // vector that defines the cohesion of a certain school of little fish
+    PVector avoidObstacles = getAvoidObstacles();                                                     // vector that defines the direction of repulsion from obstacles
+    PVector noise = new PVector(2*noise(time/800., ID*800) - 1, 2*noise(time/800., ID*800+10) - 1);  // vector that defines a random direction using Perlin Noise (a more organic type of randomness)
 
-    // cada um dos seis fatores pode ter um peso diferente
+    // each of the six factors can have a different weight
     allign.mult(2);
     avoidDir.mult(1);
     avoidSharkDir.mult(30);
@@ -44,7 +44,7 @@ public class LittleFish extends Fish {
     noise.mult(0.1);
     cohese.mult(0.005);
 
-    // adiciona os fatores (vetores) à velocidade
+    // adds the factors (vectors) to the velocity
     vel.add(allign);
     vel.add(avoidDir);
     vel.add(avoidSharkDir);
@@ -52,23 +52,23 @@ public class LittleFish extends Fish {
     vel.add(noise);
     vel.add(cohese);
 
-    vel.limit(maxSpeed);      // limita a velocidade em módulo (para não somar indefinidamente e estoirar)
+    vel.limit(maxSpeed);      // limits the velocity magnitude (to prevent indefinite addition and overflow)
 
-    return vel;               // retorna a velocidade
+    return vel;               // returns the velocity
   }
 
-  // obtem os peixes miúdo próximos e copia-os para "closeLittleFish"
+  // gets nearby little fish and copies them to "closeLittleFish"
   void getCopy() {
-    ArrayList<LittleFish> nearby = new ArrayList<LittleFish>();                                            // cria um array temporário
-    for (LittleFish other : littleFishes) {                                                                // para cada peixe-miúdo "other":
-      if (other != this && PVector.dist(other.getPos(), this.getPos()) < friendRadius) nearby.add(other);  // se não é o próprio peixe-miúdo (this) e se está a um raio próximo
+    ArrayList<LittleFish> nearby = new ArrayList<LittleFish>();                                            // creates a temporary array
+    for (LittleFish other : littleFishes) {                                                               // for each little fish "other":
+      if (other != this && PVector.dist(other.getPos(), this.getPos()) < friendRadius) nearby.add(other); // if it's not the fish itself (this) and if it's within proximity radius
     }
-    closeLittleFishes = nearby;    // copia o vetor temporário para o vetor global
+    closeLittleFishes = nearby;    // copies the temporary vector to the global vector
   }
 
-  // A seguir definem-se mais 4 funções que modelam o comportamento da natação do peixe.
+  // The following defines 4 functions that model the fish's swimming behavior.
   
-  // Obtem a velocidade média dos peixes vizinhos (não é bem verdade porque no fim não divide pelo número de elementos; ao invés disso normaliza e torna num versor)
+  // Gets the average velocity of neighboring fish (not exactly true because in the end it doesn't divide by the number of elements; instead it normalizes and makes it a unit vector)
   PVector getAverageDir () {
     PVector sum = new PVector(0, 0);
 
@@ -84,7 +84,7 @@ public class LittleFish extends Fish {
     return sum;
   }
 
-  // Obtem a velocidade de repulsão entre peixes (para evitar altas densidades de peixes/m^2)
+  // Gets the repulsion velocity between fish (to avoid high fish density per m^2)
   PVector getAvoidLittleFishDir() {
     PVector steer = new PVector(0, 0);
 
@@ -100,7 +100,7 @@ public class LittleFish extends Fish {
     return steer;
   }
   
-  // Obtem o vetor de repulsão entre o peixe-miúdo atual e os tubarões (para evitarem serem comidos)
+  // Gets the repulsion vector between the current little fish and sharks (to avoid being eaten)
   PVector getAvoidSharkDir() {
     PVector steer = new PVector(0, 0);
 
@@ -116,8 +116,8 @@ public class LittleFish extends Fish {
     return steer;
   }
   
-  // Obtem o vetor de coesão. Este vetor aponta para o centro de massa dos vizinhos num certo raio na tentativa do peixe se integrar de forma mais central no grupo.
-  // A repulsão do getAvoidLittleFishDir() evita que os peixes convirjam para o mesmo ponto (o Centro de Massa de todos os peixes).
+  // Gets the cohesion vector. This vector points to the center of mass of neighbors within a certain radius in an attempt for the fish to integrate more centrally in the group.
+  // The repulsion from getAvoidLittleFishDir() prevents fish from converging to the same point (the Center of Mass of all fish).
   PVector getCohesion () {
     PVector sum = new PVector(0, 0);
     for (LittleFish other : closeLittleFishes) {

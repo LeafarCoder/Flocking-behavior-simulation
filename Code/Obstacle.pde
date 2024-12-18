@@ -1,27 +1,27 @@
 /*
-  Implementação da classe Obstacle
- Usada para criar repulsão e oposição ao deslocamento de peixes
- */
+  Implementation of the Obstacle class
+  Used to create repulsion and opposition to fish movement
+*/
 
 class Obstacle {
-  // Atributos
-  PVector pos;    // posição do obstáculo
-  int size;       // tamanho do obstáculo 
+  // Attributes
+  PVector pos;    // position of the obstacle
+  int size;       // size of the obstacle 
 
-  // Construtor da classe! Tem sempre o mesmo nome da classe! Podem exister vários construtores se o número de parâmetros variar (neste caso opta-se por apenas um contrutor)
-  Obstacle(float xx, float yy, int s) {    // recebe como argumentos as coordenadas xx e yy que queremos dar ao obstáculo e o seu tamanho s.
-    pos = new PVector(xx, yy);             // definir a posição
-    size = s;                              // definir o tamanho
+  // Class constructor! Has the same name as the class! Multiple constructors can exist if the number of parameters varies (in this case we opt for just one constructor)
+  Obstacle(float xx, float yy, int s) {    // receives as arguments the coordinates xx and yy that we want to give to the obstacle and its size s.
+    pos = new PVector(xx, yy);             // define the position
+    size = s;                              // define the size
   }
 
-  // Nesta classe só precisamos de perguntar pela posição (o setter não é preciso porque assumimos que o objeto vai estar sempre parado)
+  // In this class we only need to ask for the position (the setter is not needed because we assume the object will always be stationary)
   public PVector getPos() {
     return pos;
   }
 
-  // função que diz como desenhar o objeto
+  // function that defines how to draw the object
   void draw_obs () {
-    fill(0);                              // pintado de preto
-    ellipse(pos.x, pos.y, size, size);    // uma elipse com posição (pos.x, pos.y) e tamanho size (eixo vertical: size, eixo horizontal: size)
+    fill(0);                              // filled with black
+    ellipse(pos.x, pos.y, size, size);    // an ellipse with position (pos.x, pos.y) and size (vertical axis: size, horizontal axis: size)
   }
 }
